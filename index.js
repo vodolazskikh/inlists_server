@@ -21,4 +21,13 @@ app
         res.json({ access_token: json.access_token, user_id: json.user_id })
       );
   })
+  .get("/userInfo", (req, res) => {
+    const { userId, token } = req.query;
+
+    fetch(
+      `${vkAuth.methodsApiUrl}users.get?user_ids=${userId}&fields=photo_100&access_token=${token}&v=5.126`
+    )
+      .then((data) => data.json())
+      .then((json) => res.json(json.response[0]));
+  })
   .listen(PORT, () => console.log(`Listening on ${PORT}`));
