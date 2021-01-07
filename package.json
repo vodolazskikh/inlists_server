@@ -10,6 +10,7 @@
     "start": "node index.js"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "ejs": "^2.5.6",
     "express": "^4.15.2"
   },
@@ -19,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/heroku/node-js-getting-started"
+    "url": "https://github.com/vodolazskikh/inlists_server"
   },
   "keywords": [
     "node",
