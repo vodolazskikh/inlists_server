@@ -2,6 +2,7 @@ const express = require("express");
 const fetch = require("node-fetch");
 const cors = require("cors");
 const vkAuth = require("./config");
+const mockLists = require("./mocks/lists");
 const PORT = process.env.PORT || 5000;
 
 const app = express();
@@ -10,6 +11,7 @@ app.use(cors());
 
 app
   .get("/", (_req, res) => res.send("Апи работает"))
+  // Получение токена ВК
   .get("/token", (req, res) => {
     const code = req.query.code;
 
@@ -21,6 +23,7 @@ app
         res.json({ access_token: json.access_token, user_id: json.user_id })
       );
   })
+  // Инфа о юзере
   .get("/userInfo", (req, res) => {
     const { userId, token } = req.query;
 
@@ -29,5 +32,27 @@ app
     )
       .then((data) => data.json())
       .then((json) => res.json(json.response[0]));
+  })
+
+  // Получение списка по id
+  .get("/listById", (req, res) => {
+    const { id } = req.query;
+    res.json({
+      id,
+      title: "Что посмотреть",
+      description: "Список фильмов для вечера пятницы",
+      rating: 4.1,
+      emoji: "🎬",
+      list: [
+        "Пираты карибского моря и грязный Виктор",
+        "Замерзшая в Суздали",
+        "Отстойники 3",
+      ],
+    });
+  })
+  // Получение списков для конкретного города
+  .get("/listByCity", (req, res) => {
+    // const { cd } = req.query;
+    res.json(mockLists);
   })
   .listen(PORT, () => console.log(`Listening on ${PORT}`));
