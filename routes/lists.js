@@ -1,31 +1,56 @@
 const mockLists = require("../mocks/lists");
 
-module.exports = function (app, db) {
+module.exports = function (app, client) {
+  const bodyParser = require("body-parser");
+  // for parsing application/json
+  app.use(bodyParser.json());
+
   app
     // Получение списка по id
     .get("/listById", (req, res) => {
       const { id } = req.query;
-      res.json({
-        id,
-        title: "Что посмотреть",
-        description: "Список фильмов для вечера пятницы",
-        rating: 4.1,
-        emoji: "🎬",
-        list: [
-          "Пираты карибского моря и грязный Виктор",
-          "Замерзшая в Суздали",
-          "Отстойники 3",
-        ],
+      const ObjectID = require("mongodb").ObjectID;
+      const _id = new ObjectID(id);
+
+      client.connect((err) => {
+        const collection = client.db("inlists").collection("lists");
+
+        collection.findOne({ _id }, function (err, result) {
+          if (err) {
+            res.json({ error: "An error has occurred" });
+          } else {
+            res.json(result);
+          }
+        });
       });
     })
     // Получение списков для конкретного города
     .get("/listByCity", (req, res) => {
-      // const { cd } = req.query;
-      res.json(mockLists);
+      client.connect((err) => {
+        const collection = client.db("inlists").collection("lists");
+        const finded = collection.find({ city: "Новосибирск" });
+
+        finded.toArray(function (err, results) {
+          if (err) {
+            res.json({ error: "An error has occurred" });
+          } else {
+            res.json(results);
+          }
+        });
+      });
     })
     // Добавление нового списка
     .post("/list", (req, res) => {
-      // const { cd } = req.query;
-      res.json(mockLists);
+      client.connect((err) => {
+        const collection = client.db("inlists").collection("lists");
+        const newList = req.body;
+        collection.insertOne(newList, (err, result) => {
+          if (err) {
+            res.json({ error: "An error has occurred" });
+          } else {
+            res.json(result.ops[0]);
+          }
+        });
+      });
     });
 };

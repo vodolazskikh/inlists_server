@@ -3,15 +3,21 @@ const fetch = require("node-fetch");
 const cors = require("cors");
 const vkAuth = require("./config");
 const PORT = process.env.PORT || 5000;
+const DB_URL = process.env.DB_URL || "";
+
+const MongoClient = require("mongodb").MongoClient;
+const client = new MongoClient(DB_URL, { useNewUrlParser: true });
 
 const app = express();
 
 app.use(cors());
 
-require("./routes/lists")(app, {});
+require("./routes/lists")(app, client);
 
 app
-  .get("/", (_req, res) => res.send("Апи работает"))
+  .get("/", (_req, res) => {
+    res.send("Апи работает");
+  })
   // Получение токена ВК
   .get("/token", (req, res) => {
     const code = req.query.code;
