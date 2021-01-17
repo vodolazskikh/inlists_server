@@ -44,10 +44,25 @@ module.exports = function (app, client) {
       client.connect((err) => {
         const collection = client.db("inlists").collection("lists");
         const newList = req.body;
+        const userId = String(req.body.authorId);
+
         collection.insertOne(newList, (err, result) => {
           if (err) {
             res.json({ error: "An error has occurred" });
           } else {
+            console.log(typeof userId);
+            // Добавим новый список и к юзеру
+            client
+              .db("inlists")
+              .collection("users")
+              .findOneAndUpdate(
+                { userId },
+                { $push: { lists: newList } },
+                (err, result) => {
+                  console.log(result);
+                }
+              );
+
             res.json(result.ops[0]);
           }
         });

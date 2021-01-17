@@ -50,19 +50,16 @@ module.exports = function (app, client) {
         .then((json) => {
           client.connect((err) => {
             const collection = client.db("inlists").collection("users");
-
-            collection.findOne(
-              { userId: String(json.user_id) },
-              function (err, result) {
-                if (err) {
-                  console.log("An error has occurred");
-                } else {
-                  if (!result) {
-                    collection.insertOne({ userId: json.user_id, lists: [] });
-                  }
+            const userId = String(json.user_id);
+            collection.findOne({ userId }, function (err, result) {
+              if (err) {
+                console.log("An error has occurred");
+              } else {
+                if (!result) {
+                  collection.insertOne({ userId, lists: [] });
                 }
               }
-            );
+            });
           });
 
           res.json({ access_token: json.access_token, user_id: json.user_id });
