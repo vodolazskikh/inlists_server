@@ -1,8 +1,10 @@
-const vkAuth = require("../config");
-const fetch = require("node-fetch");
-const cors = require("cors");
+import { Express, Request, Response } from "express";
+import { MongoClient } from "mongodb";
+import { config } from "../config";
+import fetch from "node-fetch";
+import cors from "cors";
 
-module.exports = function (app, client) {
+export function userRoutes(app: Express, client: MongoClient) {
   const bodyParser = require("body-parser");
   // for parsing application/json
   app.use(bodyParser.json());
@@ -11,18 +13,18 @@ module.exports = function (app, client) {
 
   app
     // Инфа о юзере
-    .get("/userInfo", (req, res) => {
+    .get("/userInfo", (req: Request, res: Response) => {
       const { userId, token } = req.query;
 
       fetch(
-        `${vkAuth.methodsApiUrl}users.get?user_ids=${userId}&fields=photo_100&access_token=${token}&v=5.126`
+        `${config.methodsApiUrl}users.get?user_ids=${userId}&fields=photo_100&access_token=${token}&v=5.126`
       )
-        .then((data) => data.json())
-        .then((json) => res.json(json.response[0]));
+        .then((data: any) => data.json())
+        .then((json: any) => res.json(json.response[0]));
     })
     // Получение списков для конкретного юзера
     .get("/userLists", (req, res) => {
-      client.connect((err) => {
+      client.connect((_err) => {
         const { userId } = req.query;
         const collection = client.db("inlists").collection("users");
 
@@ -44,10 +46,10 @@ module.exports = function (app, client) {
       const code = req.query.code;
 
       fetch(
-        `${vkAuth.url}access_token?client_id=${vkAuth.client_id}&client_secret=${process.env.VK_SECRET}&redirect_uri=${vkAuth.redirect_uri}&code=${code}`
+        `${config.url}access_token?client_id=${config.client_id}&client_secret=${process.env.VK_SECRET}&redirect_uri=${config.redirect_uri}&code=${code}`
       )
-        .then((data) => data.json())
-        .then((json) => {
+        .then((data: any) => data.json())
+        .then((json: any) => {
           client.connect((err) => {
             const collection = client.db("inlists").collection("users");
             const userId = String(json.user_id);
@@ -65,4 +67,4 @@ module.exports = function (app, client) {
           res.json({ access_token: json.access_token, user_id: json.user_id });
         });
     });
-};
+}

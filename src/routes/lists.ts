@@ -1,7 +1,9 @@
-const mockLists = require("../mocks/lists");
+import { Express, Request, Response } from "express";
+import { MongoClient } from "mongodb";
+import bodyParser from "body-parser";
+import { ObjectID } from "mongodb";
 
-module.exports = function (app, client) {
-  const bodyParser = require("body-parser");
+export function listsRoute(app: Express, client: MongoClient) {
   // for parsing application/json
   app.use(bodyParser.json());
 
@@ -9,10 +11,9 @@ module.exports = function (app, client) {
     // Получение списка по id
     .get("/listById", (req, res) => {
       const { id } = req.query;
-      const ObjectID = require("mongodb").ObjectID;
-      const _id = new ObjectID(id);
+      const _id = new ObjectID(id as string);
 
-      client.connect((err) => {
+      client.connect((_err) => {
         const collection = client.db("inlists").collection("lists");
 
         collection.findOne({ _id }, function (err, result) {
@@ -25,8 +26,8 @@ module.exports = function (app, client) {
       });
     })
     // Получение списков для конкретного города
-    .get("/listByCity", (req, res) => {
-      client.connect((err) => {
+    .get("/listByCity", (_req: Request, res: Response) => {
+      client.connect((_err) => {
         const collection = client.db("inlists").collection("lists");
         const finded = collection.find({ city: "Новосибирск" });
 
@@ -58,7 +59,7 @@ module.exports = function (app, client) {
               .findOneAndUpdate(
                 { userId },
                 { $push: { lists: newList } },
-                (err, result) => {
+                (_err, result) => {
                   console.log(result);
                 }
               );
@@ -68,4 +69,4 @@ module.exports = function (app, client) {
         });
       });
     });
-};
+}
