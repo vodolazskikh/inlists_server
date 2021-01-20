@@ -26,10 +26,13 @@ export function listsRoute(app: Express, client: MongoClient) {
       });
     })
     // Получение списков для конкретного города
-    .get("/listByCity", (_req: Request, res: Response) => {
+    .get("/listByCity", (req: Request, res: Response) => {
       client.connect((_err) => {
         const collection = client.db("inlists").collection("lists");
-        const finded = collection.find({ city: "Новосибирск" });
+        const finded = collection.find({
+          city: req.query.id,
+          isGeneral: true,
+        });
 
         finded.toArray(function (err, results) {
           if (err) {
