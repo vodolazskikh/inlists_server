@@ -22,6 +22,27 @@ export function userRoutes(app: Express, client: MongoClient) {
         .then((data: any) => data.json())
         .then((json: any) => res.json(json.response[0]));
     })
+
+    // Юзерские закладки
+    .get("/userBookmarks", (req: Request, res: Response) => {
+      const { userId } = req.query;
+
+      client.connect((_err) => {
+        const collection = client.db("inlists").collection("users");
+
+        collection.findOne({ userId }, function (err, result) {
+          if (err) {
+            res.json({ error: "An error has occurred" });
+          } else {
+            if (!!result && "bookmarks" in result) {
+              res.json(result.bookmarks);
+            } else {
+              res.json([]);
+            }
+          }
+        });
+      });
+    })
     // Получение списков для конкретного юзера
     .get("/userLists", (req, res) => {
       client.connect((_err) => {
