@@ -3,6 +3,7 @@ import cors from "cors";
 import { MongoClient } from "mongodb";
 import { listsRoute } from "./routes/lists";
 import { userRoutes } from "./routes/user";
+import { bookmarksRoute } from "./routes/bookmarks";
 import * as dotenv from "dotenv";
 dotenv.config({ path: __dirname + "/.env" });
 
@@ -16,6 +17,7 @@ app.use(cors());
 
 listsRoute(app, client);
 userRoutes(app, client);
+bookmarksRoute(app, client);
 
 app
   .get("/", (_req: Request, res: Response) => {
