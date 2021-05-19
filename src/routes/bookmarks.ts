@@ -20,14 +20,15 @@ export function bookmarksRoute(app: Express, client: MongoClient) {
         image: req.body.image,
         title: req.body.title,
         description: req.body.description,
+        entityId: req.body.entityId,
+        coordinates: req.body.coordinates,
       };
       const userId = String(req.body.userId);
-      console.log("newBookmark", req.body);
+
       collection.insertOne(newBookmark, (err, result) => {
         if (err) {
           res.json({ error: "An error has occurred" });
         } else {
-          console.log(typeof userId);
           // Добавим новый список и к юзеру
           client
             .db("inlists")
